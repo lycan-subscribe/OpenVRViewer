@@ -75,5 +75,3 @@ crashlytics-build.properties
 # SteamVR
 Assets/SteamVR/*
 Assets/SteamVR.meta
-Assets/SteamVR_Input/*
-Assets/SteamVR_Input.meta
