@@ -1,0 +1,8 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\SOFTWARE\Classes\x-world]
+"URL Protocol"="Packed Unity Scene"
+"Content Type"="application/x-world"
+
+[HKEY_CURRENT_USER\SOFTWARE\Classes\x-world\shell\open\command]
+@="E:\\Users\\facade\\Documents\\Unity\\VRBrowser\\Build\\VRBrowser.exe -uri \"%1\""
