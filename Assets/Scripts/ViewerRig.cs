@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.SceneManagement;
 
 public class ViewerRig : MonoBehaviour
@@ -9,21 +10,22 @@ public class ViewerRig : MonoBehaviour
     ViewerAvatar current_avatar;
     bool world_avatar = true;
     ViewerPose current_pose;
-    GameObject pose_viewpoint; // If current_pose is not null this shouldn't be either
+    ConstraintSource head_source;
+    GameObject head_constraint;
+    GameObject avatar_viewpoint;
 
     // Hacky stuff for changing the viewpoint on load
     private bool pose_changed = false;
-    private int frame_count_on_scene_load = -10;
+    private int frame_count_on_pose_change = -10;
 
 
     // Awake is called before the first frame update
     void Awake(){
         DontDestroyOnLoad(this.gameObject);
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        //SceneManager.sceneLoaded += OnSceneLoaded;
 
         loader = new SceneLoader(this);
         head = GetComponentInChildren(typeof(Camera)) as Camera;
-        
 
         // Set a default avatar?
     }
@@ -31,14 +33,14 @@ public class ViewerRig : MonoBehaviour
 
     // More hacky stuff for changing the viewpoint on load
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode){
+    /*void OnSceneLoaded(Scene scene, LoadSceneMode mode){
         frame_count_on_scene_load = Time.frameCount;
-    }
+    }*/
 
     void Update(){
         if( pose_changed ){
-            ResetCameraToPose();
-            if( Time.frameCount - frame_count_on_scene_load > 0 ){ // Load on animation frame 2
+            if( Time.frameCount - frame_count_on_pose_change > 1 ){ // Load on animation frame 2
+                ResetCameraToPose();
                 pose_changed = false;
 
                 // Then activate IK?
@@ -71,26 +73,22 @@ public class ViewerRig : MonoBehaviour
 
     public void ChangePose(ViewerPose pose){
         current_pose = pose;
-        pose_viewpoint = new GameObject("VIEWPOINT");
-        pose_viewpoint.transform.parent = current_avatar.transform;
-        pose_viewpoint.transform.localPosition = current_avatar.viewpoint;
-        Transform head_bone = current_avatar.animator.GetBoneTransform(HumanBodyBones.Head);
-        pose_viewpoint.transform.parent = head_bone;
-        // Hacky solution for hiding the head bone (BREAKS DPS PARENT CONSTRAINTS)
-        head_bone.localScale = new Vector3(0,0,0);
 
         current_avatar.SetController( pose.pose_controller );
         SetTransform(current_pose.transform); // Only need to set avatar pos
         pose_changed = true;
+        frame_count_on_pose_change = Time.frameCount;
     }
 
     public void ResetCameraToPose(){
         // Move the camera to the pose viewpoint
         // So, move the origin to viewpoint + (origin - head)
         Debug.Log(head.transform.localPosition);
-        transform.position = pose_viewpoint.transform.position - head.transform.localPosition;
-        Quaternion target_rotation = pose_viewpoint.transform.rotation * Quaternion.Inverse( head.transform.localRotation );
-        transform.rotation = Quaternion.LookRotation( target_rotation * Vector3.forward, Vector3.up );
+        transform.position = avatar_viewpoint.transform.position - head.transform.localPosition;
+        Quaternion target_rotation = avatar_viewpoint.transform.rotation * head.transform.localRotation;
+        //transform.rotation = Quaternion.Euler( 0, target_rotation.eulerAngles.y, 0 );
+        //transform.rotation = Quaternion.LookRotation( target_rotation * Vector3.forward, Vector3.up );
+        transform.rotation = Quaternion.Euler(0, avatar_viewpoint.transform.rotation.eulerAngles.y - head.transform.localRotation.eulerAngles.y, 0 );
     }
 
 
@@ -102,6 +100,27 @@ public class ViewerRig : MonoBehaviour
         if( world_avatar || force ){
             current_avatar = a;
             world_avatar = !force;
+
+            avatar_viewpoint = new GameObject("_VIEWPOINT");
+            avatar_viewpoint.transform.parent = current_avatar.transform;
+            avatar_viewpoint.transform.localPosition = current_avatar.viewpoint;
+            Transform head_bone = current_avatar.animator.GetBoneTransform(HumanBodyBones.Head);
+            
+            // Hacky solution for hiding the head bone (BREAKS DPS PARENT CONSTRAINTS)
+            head_constraint = new GameObject("_HEADBONE");
+            PositionConstraint pc = head_constraint.AddComponent<PositionConstraint>() as PositionConstraint;
+            RotationConstraint rc = head_constraint.AddComponent<RotationConstraint>() as RotationConstraint;
+            head_source.sourceTransform = head_bone;
+            head_source.weight = 1;
+            pc.AddSource(head_source);
+            head_constraint.transform.position = head_bone.position;
+            pc.constraintActive = true;
+            rc.AddSource(head_source);
+            head_constraint.transform.rotation = head_bone.rotation;
+            rc.constraintActive = true;
+
+            avatar_viewpoint.transform.parent = head_constraint.transform;
+            head_bone.localScale = new Vector3(0,0,0);
         }
     }
 }
