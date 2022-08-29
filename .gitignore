@@ -61,6 +61,7 @@ sysinfo.txt
 *.unitypackage
 *.app
 *.exe
+/[Bb]uild/*
 
 # Crashlytics generated file
 crashlytics-build.properties
@@ -75,3 +76,7 @@ crashlytics-build.properties
 # SteamVR
 Assets/SteamVR/*
 Assets/SteamVR.meta
+
+# Packages
+Assets/TextMesh Pro/*
+Assets/TextMesh Pro.meta

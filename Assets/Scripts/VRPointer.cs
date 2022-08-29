@@ -7,37 +7,22 @@ public class VRPointer : SteamVR_LaserPointer
 	
     public override void OnPointerClick(PointerEventArgs e)
      {
-         IPointerClickHandler clickHandler = e.target.GetComponent<IPointerClickHandler>();
-         if (clickHandler == null)
-         {
-             return;
-         }
- 
-		//Debug.Log("Clicking...");
-         clickHandler.OnPointerClick(new PointerEventData(EventSystem.current));
+        Debug.Log("Clicking...");
+        
+        if(e.target.GetComponent(typeof(ViewerPose)) is ViewerPose vp){
+            if(vp != null){
+                
+            }
+        }
      }
  
      public override void OnPointerOut(PointerEventArgs e)
      {
-         IPointerExitHandler pointerExitHandler = e.target.GetComponent<IPointerExitHandler>();
-         if (pointerExitHandler == null)
-         {
-             return;
-         }
- 
-		//Debug.Log("Exited");
-         pointerExitHandler.OnPointerExit(new PointerEventData(EventSystem.current));
+        Debug.Log("Exited");
      }
  
      public override void OnPointerIn(PointerEventArgs e)
      {
-         IPointerEnterHandler pointerEnterHandler = e.target.GetComponent<IPointerEnterHandler>();
-         if (pointerEnterHandler == null)
-         {
-             return;
-         }
- 
-		//Debug.Log("Entered");
-         pointerEnterHandler.OnPointerEnter(new PointerEventData(EventSystem.current));
+        Debug.Log("Entered");
      }
  }

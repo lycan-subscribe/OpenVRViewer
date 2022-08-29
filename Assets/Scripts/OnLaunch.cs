@@ -27,13 +27,13 @@ class OnLaunch
 				string uri_https = uri.Replace("x-world://", "https://");
 				
 				UnityEngine.Debug.Log("URI provided in args, opening " + uri_https);
-				WorldLoader[] wl = UnityEngine.Object.FindObjectsOfType(typeof(WorldLoader)) as WorldLoader[];
+				ViewerRig[] wl = UnityEngine.Object.FindObjectsOfType(typeof(ViewerRig)) as ViewerRig[];
 				wl[0].LoadWorldAsync(uri_https);
 			}
 			else{
 				// DEBUG SHIT
 				
-				WorldLoader[] wl = UnityEngine.Object.FindObjectsOfType(typeof(WorldLoader)) as WorldLoader[];
+				ViewerRig[] wl = UnityEngine.Object.FindObjectsOfType(typeof(ViewerRig)) as ViewerRig[];
 				wl[0].LoadWorldAsync("https://public-vr-test-scenes.s3.us-west-2.amazonaws.com/samplescene.xworld");
 			}
 		}

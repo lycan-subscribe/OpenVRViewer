@@ -5,23 +5,19 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
-public class WorldLoader : MonoBehaviour
+public class SceneLoader
 {
-	
-	private Scene current_scene;
-	private ViewerWorld world_component;
-	
-	// Start is called before the first frame update
-    void Start(){
-        DontDestroyOnLoad(this.gameObject);
-    }
-	
-	public bool LoadWorldAsync(string uri){
-		StartCoroutine( DownloadAndLoad( uri ) );
-		return true;
+	public Scene current_scene;
+	private ViewerScene world_component;
+
+	private ViewerRig parent;
+	private Transform default_spawn = new GameObject().transform;
+
+	public SceneLoader(ViewerRig parent_t){
+		parent = parent_t;
 	}
 	
-    private IEnumerator DownloadAndLoad(string uri){
+    public IEnumerator DownloadAndLoad(string uri){
 		
 		
 		// We want https, not x-world
@@ -81,9 +77,10 @@ public class WorldLoader : MonoBehaviour
 		
 		// Process and teleport to spawn
 		foreach(var obj in current_scene.GetRootGameObjects() ){
-			if( obj.GetComponent(typeof(ViewerWorld)) is ViewerWorld vw ){
+			if( obj.GetComponent(typeof(ViewerScene)) is ViewerScene vw ){
 				if(vw != null){
 					world_component = vw;
+					parent.current_avatar = world_component.avatar;
 				}
 			}
 			else if( obj.GetComponent(typeof(AudioListener)) is AudioListener al ){
@@ -94,31 +91,20 @@ public class WorldLoader : MonoBehaviour
 		
 		if( world_component == null ){
 			Debug.Log("No world component found. Teleporting to (0,0,0)");
-			transform.position = new Vector3(0,0,0);
+			parent.SetTransform(default_spawn); //Untested, might break
 		}
 		else if( world_component.poses.Length > 0 ){
 			// Start them off in the default pose
 			Debug.Log("Spawning in pose 0...");
-			
-			transform.position = world_component.poses[0].transform.position;
-			transform.rotation = world_component.poses[0].transform.rotation;
-			transform.localScale = world_component.poses[0].transform.localScale;
-			
-			world_component.avatar.transform.position = world_component.poses[0].transform.position;
-			world_component.avatar.transform.rotation = world_component.poses[0].transform.rotation;
-			world_component.avatar.transform.localScale = world_component.poses[0].transform.localScale;
-			
-			world_component.avatar.SetController( world_component.poses[0].pose_controller );
+			parent.ChangePose(world_component.poses[0]);
 		}
 		else if( world_component.spawn != null ){
 			Debug.Log("No poses found, moving to spawn point...");
-			transform.position = world_component.spawn.transform.position;
-			world_component.avatar.enabled = false;
+			parent.SetTransform(world_component.spawn.transform);
 		}
 		else{
 			Debug.Log("No spawn point found. Teleporting to (0,0,0)");
-			transform.position = new Vector3(0,0,0);
-			world_component.avatar.enabled = false;
+			parent.SetTransform(default_spawn); //Untested, might break
 		}
 	}
 }
