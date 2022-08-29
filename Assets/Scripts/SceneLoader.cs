@@ -11,7 +11,7 @@ public class SceneLoader
 	private ViewerScene world_component;
 
 	private ViewerRig parent;
-	private Transform default_spawn = new GameObject().transform;
+	//private Transform default_spawn = new GameObject().transform;
 
 	public SceneLoader(ViewerRig parent_t){
 		parent = parent_t;
@@ -80,7 +80,7 @@ public class SceneLoader
 			if( obj.GetComponent(typeof(ViewerScene)) is ViewerScene vw ){
 				if(vw != null){
 					world_component = vw;
-					parent.current_avatar = world_component.avatar;
+					parent.ChangeAvatar( world_component.avatar );
 				}
 			}
 			else if( obj.GetComponent(typeof(AudioListener)) is AudioListener al ){
@@ -91,7 +91,7 @@ public class SceneLoader
 		
 		if( world_component == null ){
 			Debug.Log("No world component found. Teleporting to (0,0,0)");
-			parent.SetTransform(default_spawn); //Untested, might break
+			//parent.SetTransform(default_spawn); //Untested, might break
 		}
 		else if( world_component.poses.Length > 0 ){
 			// Start them off in the default pose
@@ -104,7 +104,7 @@ public class SceneLoader
 		}
 		else{
 			Debug.Log("No spawn point found. Teleporting to (0,0,0)");
-			parent.SetTransform(default_spawn); //Untested, might break
+			//parent.SetTransform(default_spawn); //Untested, might break
 		}
 	}
 }

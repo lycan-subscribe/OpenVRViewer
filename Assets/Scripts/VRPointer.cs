@@ -9,11 +9,11 @@ public class VRPointer : SteamVR_LaserPointer
      {
         Debug.Log("Clicking...");
         
-        if(e.target.GetComponent(typeof(ViewerPose)) is ViewerPose vp){
+        /*if(e.target.GetComponent(typeof(ViewerPose)) is ViewerPose vp){
             if(vp != null){
-                
+
             }
-        }
+        }*/
      }
  
      public override void OnPointerOut(PointerEventArgs e)
