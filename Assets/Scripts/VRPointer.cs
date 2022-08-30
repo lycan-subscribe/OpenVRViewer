@@ -5,6 +5,7 @@ using Valve.VR.Extras;
 
 public class VRPointer : SteamVR_LaserPointer
 {
+    public GameObject collider_prefab;
     ViewerRig parent;
     GameObject visible_collider;
 
@@ -24,14 +25,18 @@ public class VRPointer : SteamVR_LaserPointer
                 parent.ChangePose(vp);
             }
         }
+        else{
+            Debug.Log("Clicked something else...");
+        }
     }
 
     public override void OnPointerOut(PointerEventArgs e)
     {
         if(visible_collider != null){
             Debug.Log("Exited");
-            Destroy( visible_collider );
+            GameObject temp = visible_collider;
             visible_collider = null;
+            Destroy( temp );
         }
     }
 
@@ -41,8 +46,9 @@ public class VRPointer : SteamVR_LaserPointer
 
         if(e.target.GetComponent(typeof(ViewerPose)) is ViewerPose vp){
             if(vp != null){
+                Debug.Log("Entered pose");
                 Collider c = e.target.GetComponent<Collider>();
-                visible_collider = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                visible_collider = Instantiate(collider_prefab);
                 visible_collider.transform.parent = e.target;
                 visible_collider.transform.position = c.bounds.center;
                 visible_collider.transform.localScale = c.bounds.size;

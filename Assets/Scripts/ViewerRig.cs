@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class ViewerRig : MonoBehaviour
 {
     SceneLoader loader;
-    Camera head;
+    public GameObject head;
 
     ViewerAvatar current_avatar;
     bool world_avatar = true;
@@ -25,7 +25,6 @@ public class ViewerRig : MonoBehaviour
         //SceneManager.sceneLoaded += OnSceneLoaded;
 
         loader = new SceneLoader(this);
-        head = GetComponentInChildren(typeof(Camera)) as Camera;
 
         // Set a default avatar?
     }
@@ -59,10 +58,12 @@ public class ViewerRig : MonoBehaviour
 
     // Pose stuff, moving around
 
-    public void SetTransform(Transform t, bool move_camera = false){
-        transform.position = t.transform.position;
-        transform.rotation = t.transform.rotation;
-        transform.localScale = t.transform.localScale;
+    public void SetTransform(Transform t, bool move_camera = true){
+        if(move_camera){
+            transform.position = t.transform.position;
+            transform.rotation = t.transform.rotation;
+            transform.localScale = t.transform.localScale;
+        }
 
         if( current_avatar != null ){
             current_avatar.transform.position = t.transform.position;
@@ -75,7 +76,7 @@ public class ViewerRig : MonoBehaviour
         current_pose = pose;
 
         current_avatar.SetController( pose.pose_controller );
-        SetTransform(current_pose.transform); // Only need to set avatar pos
+        SetTransform(current_pose.transform, false); // Only need to set avatar pos
         pose_changed = true;
         frame_count_on_pose_change = Time.frameCount;
     }
@@ -83,12 +84,12 @@ public class ViewerRig : MonoBehaviour
     public void ResetCameraToPose(){
         // Move the camera to the pose viewpoint
         // So, move the origin to viewpoint + (origin - head)
-        Debug.Log(head.transform.localPosition);
-        transform.position = avatar_viewpoint.transform.position - head.transform.localPosition;
-        Quaternion target_rotation = avatar_viewpoint.transform.rotation * head.transform.localRotation;
-        //transform.rotation = Quaternion.Euler( 0, target_rotation.eulerAngles.y, 0 );
-        //transform.rotation = Quaternion.LookRotation( target_rotation * Vector3.forward, Vector3.up );
-        transform.rotation = Quaternion.Euler(0, avatar_viewpoint.transform.rotation.eulerAngles.y - head.transform.localRotation.eulerAngles.y, 0 );
+        // ROTATE FIRST (IDK WHY)
+        transform.rotation = Quaternion.Euler(0, avatar_viewpoint.transform.eulerAngles.y - head.transform.localEulerAngles.y, 0 );
+        transform.position = avatar_viewpoint.transform.position + (transform.position - head.transform.position);
+        //Debug.Log("Head Position current / target: " + head.transform.position + " " + avatar_viewpoint.transform.position );
+        //Debug.Log("Head Rotation current / target: " + head.transform.eulerAngles.y + " " + avatar_viewpoint.transform.eulerAngles.y );
+        //Debug.Log("Sanity check, head local transform: " + head.transform.localPosition + " " + head.transform.localEulerAngles.y );
     }
 
 
