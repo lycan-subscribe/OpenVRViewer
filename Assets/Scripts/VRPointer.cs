@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 using Valve.VR.Extras;
 
 // This is throwing a lot of spooky errors
@@ -55,4 +55,4 @@ public class VRPointer : SteamVR_LaserPointer
             }
         }
     }
- }
+ }*/

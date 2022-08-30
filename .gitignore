@@ -74,11 +74,11 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # SteamVR
-Assets/SteamVR/*
+Assets/SteamVR/
 Assets/SteamVR.meta
 
 # Packages
-Assets/TextMesh Pro/*
+Assets/TextMesh Pro/
 Assets/TextMesh Pro.meta
-Assets/DynamicBone/*
+Assets/DynamicBone/
 Assets/DynamicBone.meta
